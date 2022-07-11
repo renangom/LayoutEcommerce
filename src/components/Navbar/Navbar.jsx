@@ -14,6 +14,7 @@ import {
 import Search from "@mui/icons-material/Search";
 import Badge from "@mui/material/Badge";
 import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
+import { Link } from "react-router-dom";
 
 const Navbar = () => {
   return (
@@ -30,8 +31,12 @@ const Navbar = () => {
           <Logo>RENAN.</Logo>
         </Center>
         <Right>
-          <MenuItem>Registrar</MenuItem>
-          <MenuItem>Login</MenuItem>
+          <Link to="/register">
+            <MenuItem>Registrar</MenuItem>
+          </Link>
+          <Link to="/login">
+            <MenuItem>Login</MenuItem>
+          </Link>
           <MenuItem>
             <Badge badgeContent={4} color="primary">
               <ShoppingCartOutlinedIcon />
