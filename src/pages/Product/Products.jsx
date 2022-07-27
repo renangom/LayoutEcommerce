@@ -1,10 +1,13 @@
 import { Add, Remove } from "@mui/icons-material";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import { useLocation } from "react-router-dom";
 import Announcement from "../../components/Announcement/Announcement";
 import Footer from "../../components/Footer/Footer";
 import Navbar from "../../components/Navbar/Navbar";
 import Newsletter from "../../components/Newsletter/Newsletter";
-
+import { addProduct } from "../../redux/cartRedux";
+import {publicRequest} from '../../requestMethods'
 import {
   Container,
   Wrapper,
@@ -27,46 +30,87 @@ import {
 } from "./styled";
 
 function Product() {
+  const location = useLocation()
+  const id = location.pathname.split("/")[2]
+
+  const [quantity, setQuantity] = useState(1)
+  const [product, setProduct] = useState({})
+  const [color, setColor] = useState("")
+  const [size, setSize] = useState("")
+  const dispatch = useDispatch()
+
+  useEffect(() => {
+    const getProduct = async () => {
+      try{
+        const res = await publicRequest.get("/products/find/"+id)
+        setProduct(res.data)
+        console.log(res.data)
+      }catch {}
+    }
+    getProduct()
+  }, [id])
+
+  const handleQuantity = (ordem) => {
+    if(ordem === "decre"){
+      quantity > 1 && setQuantity(quantity - 1)
+    }else{
+      setQuantity(quantity + 1)
+    }
+  }
+
+  const handleClick = () => {
+    //update cart
+    dispatch(
+      addProduct({...product, quantity,color, size})
+    )
+
+    console.log(product)
+
+  }
+
+
   return (
     <Container>
       <Navbar />
       <Announcement />
       <Wrapper>
         <ImageContainer>
-          <Image src="https://i.ibb.co/S6qMxwr/jean.jpg" />
+          <Image src={product.img} />
         </ImageContainer>
         <InfoContainer>
-          <Title> sdondosandsd</Title>
+          <Title> {product.title} </Title>
           <Description>
-            dnsadnsadnsapdnsadsdsadadsadsasasdddddddddddddddddddddddddddaaaaasdsdsdsdsadsad
+            {product.desc}
           </Description>
-          <Price> R$ 20</Price>
+          <Price> R$ {product.price * quantity} </Price>
           <FilterContainer>
             <Filter>
               <FilterTitle> Cor </FilterTitle>
-              <FilterColor color="black" />
-              <FilterColor color="darkblue" />
-              <FilterColor color="gray" />
+              {product.color?.map((cor) => {
+                return (
+                  <FilterColor color={cor} key={cor} onClick={() => setColor(cor)} />
+                )
+              })}
+
             </Filter>
             <Filter>
               <FilterTitle> Tamanho </FilterTitle>
               <FilterSize>
-                <FilterSizeOption>M</FilterSizeOption>
-                <FilterSizeOption>P</FilterSizeOption>
-                <FilterSizeOption>G</FilterSizeOption>
-                <FilterSizeOption>GG</FilterSizeOption>
-                <FilterSizeOption>GORDO</FilterSizeOption>
-                <FilterSizeOption>OBESO</FilterSizeOption>
+                {product.size?.map((tamanho) => {
+                  return(
+                    <FilterSizeOption key={tamanho} onChange={(e) => setSize(e.target.value)}>{tamanho}</FilterSizeOption>
+                  )
+                })}
               </FilterSize>
             </Filter>
           </FilterContainer>
           <AddContainer>
             <AmountContainer>
-              <Remove />
-              <Amount> 1 </Amount>
-              <Add />
+              <Remove onClick={() => handleQuantity("decre")} />
+              <Amount> {quantity} </Amount>
+              <Add onClick={() => handleQuantity("incres")} />
             </AmountContainer>
-            <Button> Adicionar ao Carrinho </Button>
+            <Button onClick={handleClick}> Adicionar ao Carrinho </Button>
           </AddContainer>
         </InfoContainer>
       </Wrapper>

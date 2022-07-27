@@ -7,9 +7,10 @@ import Register from "./pages/Register/Register";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import Navbar from "./components/Navbar/Navbar";
 import Footer from "./components/Footer/Footer";
+import { useSelector } from "react-redux";
 
 function App() {
-  const user = true;
+  const user = useSelector(state => state.user.currentUser)
   return (
     <>
       <Router>
